@@ -20,12 +20,34 @@ import {
   TextField,
   Checkbox,
 } from "@material-ui/core";
+import io from "socket.io-client";
+let socket;
 
 function Resource() {
+  useEffect(() => {
+    socket = io("http://localhost:4000");
+    socket.on("new_servers", (newServers) => {
+      console.log(newServers);
+      getServers();
+    });
+    return () => {
+      socket.disconnect();
+    };
+  });
   const { users } = useContext(UserContext);
-  const { servers } = useContext(ServerContext);
+  const { servers, getServers } = useContext(ServerContext);
   const { user } = useContext(AuthenticationContext);
-  console.log(user);
+
+  const registCore = (registInfo) => {
+    socket.emit("regist_core", { registInfo });
+  };
+
+  const completeCore = (completeInfo) => {
+    //complete task
+    console.log(completeInfo);
+    socket.emit("complete_core", { completeInfo });
+  };
+
   return (
     <>
       <Link to="/">go to home</Link>
@@ -67,12 +89,18 @@ function Resource() {
                                   uid={user.uid}
                                   serverId={server.server_id}
                                   coreIndex={index}
+                                  registCore={registCore}
                                 />
                               ) : null}
                               {core.uid === user.uid ? (
-                                <ClearCoreDialog />
+                                <CompleteCoreDialog
+                                  uid={user.uid}
+                                  serverId={server.server_id}
+                                  coreIndex={index}
+                                  completeCore={completeCore}
+                                />
                               ) : null}
-                              {core.uid !== null && core.uid !== core.uid ? (
+                              {core.uid !== null && core.uid !== user.uid ? (
                                 <UsedCoreDialog />
                               ) : null}
                             </TableCell>
@@ -89,11 +117,20 @@ function Resource() {
   );
 }
 
-const RegisterCoreDialog = ({ uid, serverId, coreIndex }) => {
-  const { registCore } = useContext(ServerContext);
+const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
+  const dt = new Date();
+  const initialEndTime = {
+    datetime: `${dt.getFullYear()}-${`${dt.getMonth() + 1}`.padStart(
+      2,
+      0
+    )}-${`${dt.getDate() + 1}`.padStart(2, 0)}T${`${dt.getHours()}`.padStart(
+      2,
+      0
+    )}:${`${dt.getMinutes()}`.padStart(2, 0)}`,
+  };
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [endTime, setEndTime] = useState();
+  const [endTime, setEndTime] = useState(initialEndTime.datetime);
   const handleClose = () => {
     setOpen(false);
   };
@@ -103,8 +140,6 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex }) => {
     setOpen(true);
   };
   const handleRegist = () => {
-    setOpen(false);
-    alert(endTime);
     let registInfo = {
       uid: uid,
       server_id: serverId,
@@ -114,10 +149,17 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex }) => {
     };
     if (checked) {
       registInfo.isUndecided = true;
+      registCore(registInfo);
+      setOpen(false);
     } else {
       registInfo.end = endTime;
+      if (endTime) {
+        registCore(registInfo);
+        setOpen(false);
+      } else {
+        alert("please select end time or undecided");
+      }
     }
-    registCore(registInfo);
   };
   return (
     <>
@@ -156,7 +198,7 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex }) => {
   );
 };
 
-const ClearCoreDialog = () => {
+const CompleteCoreDialog = ({ uid, serverId, coreIndex, completeCore }) => {
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
@@ -164,15 +206,24 @@ const ClearCoreDialog = () => {
   const handleOpen = () => {
     setOpen(true);
   };
+  const handleComplete = () => {
+    let completeInfo = {
+      uid: uid,
+      server_id: serverId,
+      core_index: coreIndex,
+    };
+    completeCore(completeInfo);
+    setOpen(false);
+  };
   return (
     <>
-      <Button onClick={handleOpen}>Use</Button>
+      <Button onClick={handleOpen}>complete</Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>fulfilled</DialogTitle>
         <DialogContent></DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>cancel</Button>
-          <Button onClick={handleClose}>fulfilled</Button>
+          <Button onClick={handleComplete}>complete</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -189,7 +240,7 @@ const UsedCoreDialog = () => {
   };
   return (
     <>
-      <Button onClick={handleOpen}>Use</Button>
+      <Button onClick={handleOpen}>Used</Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>used core</DialogTitle>
         <DialogContent></DialogContent>

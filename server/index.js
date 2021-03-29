@@ -5,6 +5,11 @@ const port = 4000;
 const app = express();
 const { nanoid } = require("nanoid");
 const mysqlEnv = require("./mySQLSetting");
+const http = require("http");
+const httpServer = http.createServer(app);
+const io = require("socket.io")(httpServer, {
+  cors: { origin: "*" },
+});
 
 app.use(cors());
 app.use(express.json());
@@ -124,10 +129,9 @@ app.get("/get_servers", (req, res) => {
         ...server,
         use_status: use_status,
       };
-      console.log(server);
+      //   console.log(server);
       return server;
     });
-    // console.log(server);
     res.send(servers);
   });
 });
@@ -139,7 +143,7 @@ app.get("/get_users", (req, res) => {
   });
 });
 app.post("/add_user", (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const { username, grade, password } = req.body.newUser;
   let sqlInsert = "insert into users values(?,?,?,?,now())";
   connection.query(
@@ -151,7 +155,7 @@ app.post("/add_user", (req, res) => {
   );
 });
 app.post("/add_server", (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const { server_address, max_cores } = req.body.newServer;
   let sqlInsert =
     "insert into servers value(?,?,?,now(),null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)";
@@ -164,18 +168,17 @@ app.post("/add_server", (req, res) => {
   );
 });
 app.post("/edit_user", (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const uid = req.body.uid;
   const { username, grade } = req.body.editUser;
   let sqlUpdate = "update users set username=?, grade=? where uid=?";
-  console.log(sqlUpdate);
   connection.query(sqlUpdate, [username, grade, uid], (error, result) => {
     res.send(result);
   });
 });
 
 app.post("/edit_server", (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const server_id = req.body.serverId;
   const { server_address, max_cores } = req.body.editServer;
   let sqlUpdate =
@@ -189,6 +192,44 @@ app.post("/edit_server", (req, res) => {
   );
 });
 
-app.listen(port, () => {
+io.on("connection", (socket) => {
+  console.log(socket.id, "is connecting");
+
+  socket.on("regist_core", (input) => {
+    console.log(input);
+
+    let { uid, server_id, core_index, isUndecided, end } = input.registInfo;
+    if (!isUndecided) {
+      let [date, time] = end.split("T");
+      end = `${date} ${time}:00`;
+      console.log(end);
+    }
+
+    let sqlUpdate = `update servers set core_${core_index + 1}_uid=?, core_${
+      core_index + 1
+    }_start=now(), core_${core_index + 1}_end=? where server_id=?`;
+    console.log(sqlUpdate);
+    connection.query(sqlUpdate, [uid, end, server_id], (error, result) => {
+      io.emit("new_servers", { message: "OK" });
+    });
+  });
+
+  socket.on("complete_core", (input) => {
+    console.log(input);
+    let { uid, server_id, core_index } = input.completeInfo;
+    let sqlUpdate = `update servers set core_${core_index + 1}_uid=null, core_${
+      core_index + 1
+    }_start=null, core_${core_index + 1}_end=null where server_id=?`;
+    connection.query(sqlUpdate, [server_id], (error, result) => {
+      io.emit("new_servers", { message: "ok" });
+    });
+  });
+
+  socket.on("disconnect", () => {
+    console.log(socket.id, "was disconnected");
+  });
+});
+
+httpServer.listen(port, () => {
   console.log("listening on port *: 4000");
 });

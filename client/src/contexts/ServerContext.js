@@ -31,14 +31,6 @@ export const ServerProvider = (props) => {
       getServers();
     });
   };
-  const registCore = (registInfo) => {
-    console.log(registInfo);
-    // Axios.post("http://localhost:4000/regist_core", { registInfo }).then(
-    //   (response) => {
-    //     console.log(response);
-    //   }
-    // );
-  };
   return (
     <ServerContext.Provider
       value={{
@@ -46,7 +38,6 @@ export const ServerProvider = (props) => {
         servers: servers,
         addServer: addServer,
         editServer: editServer,
-        registCore: registCore,
       }}
     >
       {props.children}
