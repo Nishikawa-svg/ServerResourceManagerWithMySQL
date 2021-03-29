@@ -1,10 +1,13 @@
 import Axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const ServerContext = createContext();
 
 export const ServerProvider = (props) => {
   const [servers, setServers] = useState([]);
+  useEffect(() => {
+    getServers();
+  }, []);
   const getServers = () => {
     Axios.get("http://localhost:4000/get_servers").then((response) => {
       console.log(response.data);
@@ -28,6 +31,14 @@ export const ServerProvider = (props) => {
       getServers();
     });
   };
+  const registCore = (registInfo) => {
+    console.log(registInfo);
+    // Axios.post("http://localhost:4000/regist_core", { registInfo }).then(
+    //   (response) => {
+    //     console.log(response);
+    //   }
+    // );
+  };
   return (
     <ServerContext.Provider
       value={{
@@ -35,6 +46,7 @@ export const ServerProvider = (props) => {
         servers: servers,
         addServer: addServer,
         editServer: editServer,
+        registCore: registCore,
       }}
     >
       {props.children}

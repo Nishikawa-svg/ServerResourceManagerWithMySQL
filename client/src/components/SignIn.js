@@ -11,7 +11,6 @@ function SignIn() {
   const history = useHistory();
   const classes = useStyles();
   const { isAuth, setIsAuth, signIn } = useContext(AuthenticationContext);
-  const { user, setUser } = useContext(UserContext);
   const usernameElement = useRef(null);
   const passwordElement = useRef(null);
 

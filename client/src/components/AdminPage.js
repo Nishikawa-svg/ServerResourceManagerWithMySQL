@@ -17,15 +17,10 @@ import {
   DialogTitle,
   TextField,
 } from "@material-ui/core";
-import { TextFieldsSharp } from "@material-ui/icons";
 
 function AdminPage() {
   const { getServers, servers } = useContext(ServerContext);
   const { getUsers, users } = useContext(UserContext);
-  useEffect(() => {
-    getServers();
-    getUsers();
-  }, []);
 
   return (
     <>
@@ -112,7 +107,7 @@ function AdminPage() {
 }
 
 const AddUserDialog = () => {
-  const { addUser } = useContext(UserContext);
+  const { addUser, users } = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const usernameEl = useRef();
   const gradeEl = useRef();
@@ -125,7 +120,15 @@ const AddUserDialog = () => {
     setOpen(true);
   };
   const handleAddUser = () => {
-    if (passwordEl.current.value !== confirmPasswordEl.current.value) {
+    let userDuplicated = false;
+    users.map((user) => {
+      if (usernameEl.current.value === user.username) userDuplicated = true;
+    });
+    if (userDuplicated) {
+      alert(
+        `Username ${usernameEl.current.value} is already existed. Please change username.`
+      );
+    } else if (passwordEl.current.value !== confirmPasswordEl.current.value) {
       alert("not same password");
     } else {
       const newUser = {
@@ -162,7 +165,7 @@ const AddUserDialog = () => {
 };
 
 const EditUserDialog = ({ uid, username, grade }) => {
-  const { editUser } = useContext(UserContext);
+  const { editUser, users } = useContext(UserContext);
   const [edited, setEdited] = useState({ username: username, grade: grade });
   const [open, setOpen] = useState(false);
   const handleClose = () => {
@@ -172,8 +175,20 @@ const EditUserDialog = ({ uid, username, grade }) => {
     setOpen(true);
   };
   const handleEditUser = () => {
-    editUser(uid, edited);
-    setOpen(false);
+    let userDuplicated = false;
+    users.map((user) => {
+      if (user.uid !== uid && user.username === edited.username) {
+        userDuplicated = true;
+      }
+    });
+    if (userDuplicated) {
+      alert(
+        `Username ${edited.username} is already exist. Please change username`
+      );
+    } else {
+      editUser(uid, edited);
+      setOpen(false);
+    }
   };
   return (
     <>

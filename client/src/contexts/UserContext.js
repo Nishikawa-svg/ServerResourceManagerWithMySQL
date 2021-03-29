@@ -1,10 +1,12 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import Axios from "axios";
 export const UserContext = createContext();
 
 export const UserProvider = (props) => {
+  useEffect(() => {
+    getUsers();
+  }, []);
   const [users, setUsers] = useState([]);
-  const [user, setUser] = useState();
   const getUsers = () => {
     Axios.get("http://localhost:4000/get_users").then((response) => {
       setUsers(response.data);
@@ -28,8 +30,6 @@ export const UserProvider = (props) => {
   return (
     <UserContext.Provider
       value={{
-        user: user,
-        setUser: setUser,
         users: users,
         getUsers: getUsers,
         addUser: addUser,

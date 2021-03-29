@@ -10,7 +10,6 @@ function AdminSignIn() {
   const passwordRef = useRef();
   const { adminSignIn } = useContext(AuthenticationContext);
   const handleSignIn = () => {
-    // alert(passwordRef.current.value);
     adminSignIn(passwordRef.current.value);
   };
   return (
