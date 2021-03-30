@@ -64,8 +64,6 @@ app.post("/admin_sign_in", (req, res) => {
   const hashedPassword = req.body.hashedPassword;
   let sqlSelect = "select password from admin";
   connection.query(sqlSelect, (error, result) => {
-    console.log(result[0].password);
-    console.log(hashedPassword);
     let authentication = false;
     if (result[0].password === hashedPassword) {
       authentication = true;
@@ -78,7 +76,6 @@ app.post("/auto_sign_in", (req, res) => {
   const storageId = req.body.storageId;
   let sqlSelect = "select uid,username from users where uid=?";
   connection.query(sqlSelect, [storageId], (error, result) => {
-    console.log(result);
     let msg;
     let userInfo;
     let authentication = false;
@@ -98,7 +95,7 @@ app.post("/sign_in", (req, res) => {
   const hashedPassword = req.body.hashedPassword;
   let sqlSelect =
     "select uid,username from users where username=? and password=?";
-  console.log(username, hashedPassword);
+  // console.log(username, hashedPassword);
   connection.query(sqlSelect, [username, hashedPassword], (error, result) => {
     let msg;
     let userInfo;
@@ -167,7 +164,7 @@ app.get("/get_users", (req, res) => {
   });
 });
 app.post("/add_user", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { username, grade, hashedPassword } = req.body.newUser;
   let sqlInsert = "insert into users values(?,?,?,?,now())";
   connection.query(
@@ -226,13 +223,12 @@ io.on("connection", (socket) => {
     if (!isUndecided) {
       let [date, time] = end.split("T");
       end = `${date} ${time}:00`;
-      console.log(end);
+      // console.log(end);
     }
 
     let sqlUpdate = `update servers set core_${core_index + 1}_uid=?, core_${
       core_index + 1
     }_start=now(), core_${core_index + 1}_end=? where server_id=?`;
-    console.log(sqlUpdate);
     connection.query(sqlUpdate, [uid, end, server_id], (error, result) => {
       io.emit("new_servers", { message: "OK" });
     });

@@ -19,11 +19,113 @@ import {
   DialogTitle,
   TextField,
   Checkbox,
+  makeStyles,
+  Paper,
 } from "@material-ui/core";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import BlockIcon from "@material-ui/icons/Block";
+import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
+import DoneIcon from "@material-ui/icons/Done";
 import io from "socket.io-client";
 let socket;
 
+const useStyles = makeStyles({
+  backToHomeLink: {
+    textDecoration: "none",
+    color: "blue",
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  serverTablePaper: {
+    border: "solid 1px gray",
+  },
+  serverTableTitle: {
+    textAlign: "center",
+    fontSize: 30,
+    fontWeight: "bolder",
+    marginTop: 40,
+  },
+  serverTableHeadRow: {
+    backgroundColor: "#333333",
+  },
+  serverTableHeadCell: {
+    color: "white",
+    fontSize: 16,
+  },
+  serverTableBodyRowUse: {
+    backgroundColor: "white",
+  },
+  serverTableBodyRowComplete: {
+    backgroundColor: "yellow",
+  },
+  serverTableBodyRowUsed: {
+    backgroundColor: "gray",
+  },
+  serverUseButton: {
+    textTransform: "none",
+  },
+  serverUseButtonIcon: {
+    marginLeft: 5,
+    marginRight: -5,
+  },
+  serverCompleteButton: {
+    textTransform: "none",
+  },
+  serverCompleteButtonIcon: {
+    marginLeft: 5,
+    marginRight: -5,
+  },
+  serverUsedButton: {
+    textTransform: "none",
+  },
+  serverUsedButtonIcon: {
+    marginLeft: 5,
+    marginRight: -5,
+  },
+
+  reservationDialogTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  reservationDialogContent: {
+    textAlign: "center",
+  },
+  reservationDialogCancelButton: {
+    textTransform: "none",
+    color: "red",
+  },
+  reservationDialogReserveButton: {
+    textTransform: "none",
+    color: "blue",
+  },
+
+  completeDialogTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  completeDialogCancelButton: {
+    textTransform: "none",
+    color: "red",
+  },
+  completeDialogCompleteButton: {
+    textTransform: "none",
+    color: "blue",
+  },
+
+  usedDialogOKButton: {
+    textTransform: "none",
+    color: "blue",
+  },
+});
+
 function Resource() {
+  const classes = useStyles();
   useEffect(() => {
     socket = io("http://localhost:4000");
     socket.on("new_servers", (newServers) => {
@@ -48,76 +150,165 @@ function Resource() {
     socket.emit("complete_core", { completeInfo });
   };
 
+  const getUserName = (uid) => {
+    const index = users.findIndex((user) => user.uid === uid);
+    if (users) return users[index].username;
+  };
+
+  const getLocalDateTime = (datetime) => {
+    const localDatetime = new Date(datetime).toLocaleString();
+    return localDatetime;
+  };
+
   return (
     <>
-      <Link to="/">go to home</Link>
-      <div>Resource</div>
+      <Link to="/" className={classes.backToHomeLink}>
+        <Grid container>
+          <Grid item>
+            <ArrowBackIcon className={classes.backToHomeLinkIcon} />
+          </Grid>
+          <Grid item>back to home</Grid>
+        </Grid>
+      </Link>
+      <div className={classes.pageTitle}>Resource List</div>
       {servers &&
         servers.map((server) => (
           <div key={server.server_id}>
-            <div>{server.server_address}</div>
+            <div className={classes.serverTableTitle}>
+              {server.server_address}
+            </div>
             <Grid container justify="center">
               <Grid item xs={10}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>core number</TableCell>
-                        <TableCell>user</TableCell>
-                        <TableCell>start time</TableCell>
-                        <TableCell>end time</TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {user &&
-                        server.use_status.map((core, index) => (
-                          <TableRow key={index}>
-                            <TableCell>core{index + 1}</TableCell>
-                            <TableCell>
-                              {core.uid === null ? "no user" : core.uid}
-                            </TableCell>
-                            <TableCell>
-                              {core.start === null ? "" : core.start}
-                            </TableCell>
-                            <TableCell>
-                              {core.end === null ? "" : core.end}
-                            </TableCell>
-                            <TableCell>
-                              {core.uid === null ? (
-                                <RegisterCoreDialog
-                                  uid={user.uid}
-                                  serverId={server.server_id}
-                                  coreIndex={index}
-                                  registCore={registCore}
-                                />
-                              ) : null}
-                              {core.uid === user.uid ? (
-                                <CompleteCoreDialog
-                                  uid={user.uid}
-                                  serverId={server.server_id}
-                                  coreIndex={index}
-                                  completeCore={completeCore}
-                                />
-                              ) : null}
-                              {core.uid !== null && core.uid !== user.uid ? (
-                                <UsedCoreDialog />
-                              ) : null}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <Paper className={classes.serverTablePaper}>
+                  <Grid container justify="center">
+                    <Grid item xs={12}>
+                      <TableContainer>
+                        <Table className={classes.serverTableRoot}>
+                          <TableHead>
+                            <TableRow className={classes.serverTableHeadRow}>
+                              <TableCell
+                                className={classes.serverTableHeadCell}
+                                align="center"
+                              >
+                                core
+                              </TableCell>
+                              <TableCell
+                                className={classes.serverTableHeadCell}
+                                align="center"
+                              >
+                                user
+                              </TableCell>
+                              <TableCell
+                                className={classes.serverTableHeadCell}
+                                align="center"
+                              >
+                                start time
+                              </TableCell>
+                              <TableCell
+                                className={classes.serverTableHeadCell}
+                                align="center"
+                              >
+                                end time
+                              </TableCell>
+                              <TableCell
+                                className={classes.serverTableHeadCell}
+                                align="center"
+                              >
+                                status
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {user &&
+                              server.use_status.map((core, index) => (
+                                <TableRow
+                                  key={index}
+                                  className={
+                                    core.uid === null
+                                      ? classes.serverTableBodyRowUse
+                                      : core.uid === user.uid
+                                      ? classes.serverTableBodyRowComplete
+                                      : classes.serverTableBodyRowUsed
+                                  }
+                                >
+                                  <TableCell
+                                    className={classes.serverTableBodyCell}
+                                    align="center"
+                                  >
+                                    core{index + 1}
+                                  </TableCell>
+                                  <TableCell
+                                    className={classes.serverTableBodyCell}
+                                    align="center"
+                                  >
+                                    {core.uid === null
+                                      ? ""
+                                      : getUserName(core.uid)}
+                                  </TableCell>
+                                  <TableCell
+                                    className={classes.serverTableBodyCell}
+                                    align="center"
+                                  >
+                                    {core.start === null
+                                      ? ""
+                                      : getLocalDateTime(core.start)}
+                                  </TableCell>
+                                  <TableCell
+                                    className={classes.serverTableBodyCell}
+                                    align="center"
+                                  >
+                                    {core.end === null
+                                      ? ""
+                                      : getLocalDateTime(core.end)}
+                                    {core.end === null && core.uid !== null
+                                      ? "undecided"
+                                      : null}
+                                  </TableCell>
+                                  <TableCell
+                                    className={classes.serverTableBodyCell}
+                                    align="center"
+                                  >
+                                    {core.uid === null ? (
+                                      <ReserveCoreDialog
+                                        uid={user.uid}
+                                        serverId={server.server_id}
+                                        coreIndex={index}
+                                        registCore={registCore}
+                                      />
+                                    ) : null}
+                                    {core.uid === user.uid ? (
+                                      <CompleteCoreDialog
+                                        uid={user.uid}
+                                        serverId={server.server_id}
+                                        coreIndex={index}
+                                        completeCore={completeCore}
+                                      />
+                                    ) : null}
+                                    {core.uid !== null &&
+                                    core.uid !== user.uid ? (
+                                      <UsedCoreDialog />
+                                    ) : null}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Grid>
+                  </Grid>
+                </Paper>
               </Grid>
             </Grid>
           </div>
         ))}
+      <br />
+      <br />
+      <br />
     </>
   );
 }
 
-const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
+const ReserveCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
   const dt = new Date();
   const initialEndTime = {
     datetime: `${dt.getFullYear()}-${`${dt.getMonth() + 1}`.padStart(
@@ -128,9 +319,11 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
       0
     )}:${`${dt.getMinutes()}`.padStart(2, 0)}`,
   };
+  console.log(initialEndTime);
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [endTime, setEndTime] = useState(initialEndTime.datetime);
+  const [endTime, setEndTime] = useState(null);
   const handleClose = () => {
     setOpen(false);
   };
@@ -139,7 +332,7 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
     setEndTime();
     setOpen(true);
   };
-  const handleRegist = () => {
+  const handleReserve = () => {
     let registInfo = {
       uid: uid,
       server_id: serverId,
@@ -163,35 +356,64 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
   };
   return (
     <>
-      <Button onClick={handleOpen}>Use</Button>
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        color="secondary"
+        className={classes.serverUseButton}
+      >
+        available
+        <RadioButtonUncheckedIcon className={classes.serverUseButtonIcon} />
+      </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>core registration</DialogTitle>
-        <DialogContent>
-          {checked ? (
-            <div>undecided</div>
-          ) : (
-            <TextField
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              type="datetime-local"
-              label="end time"
-              InputLabelProps={{ shrink: true }}
-            />
+        <DialogTitle>
+          <div className={classes.reservationDialogTitle}>
+            Server Reservation
+          </div>
+        </DialogTitle>
+        <DialogContent className={classes.reservationDialogContent}>
+          <div>Please select end time</div>
+          <br />
+          {checked ? null : (
+            <>
+              <TextField
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                type="datetime-local"
+                label="end time"
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+              />
+              <br />
+              <br />
+              or <br />
+              <br />
+            </>
           )}
-          <br />
-          or
-          <br />
           <label>
-            undecided
             <Checkbox
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
             />
+            Undecided
           </label>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>cancel</Button>
-          <Button onClick={handleRegist}>regist</Button>
+          <Grid container justify="space-around">
+            <Button
+              onClick={handleClose}
+              className={classes.reservationDialogCancelButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReserve}
+              className={classes.reservationDialogReserveButton}
+              disabled={!(endTime || checked)}
+            >
+              Regist
+            </Button>
+          </Grid>
         </DialogActions>
       </Dialog>
     </>
@@ -199,6 +421,7 @@ const RegisterCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
 };
 
 const CompleteCoreDialog = ({ uid, serverId, coreIndex, completeCore }) => {
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
@@ -217,13 +440,35 @@ const CompleteCoreDialog = ({ uid, serverId, coreIndex, completeCore }) => {
   };
   return (
     <>
-      <Button onClick={handleOpen}>complete</Button>
+      <Button
+        onClick={handleOpen}
+        className={classes.serverCompleteButton}
+        variant="contained"
+        color="primary"
+      >
+        complete
+        <DoneIcon className={classes.serverCompleteButtonIcon} />
+      </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>fulfilled</DialogTitle>
-        <DialogContent></DialogContent>
+        <DialogTitle>
+          <div className={classes.completeDialogTitle}>Complete</div>
+        </DialogTitle>
+        <DialogContent>Are you sure to complete using cores?</DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>cancel</Button>
-          <Button onClick={handleComplete}>complete</Button>
+          <Grid container justify="space-around">
+            <Button
+              onClick={handleClose}
+              className={classes.completeDialogCancelButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleComplete}
+              className={classes.completeDialogCompleteButton}
+            >
+              Complete
+            </Button>
+          </Grid>
         </DialogActions>
       </Dialog>
     </>
@@ -231,6 +476,7 @@ const CompleteCoreDialog = ({ uid, serverId, coreIndex, completeCore }) => {
 };
 
 const UsedCoreDialog = () => {
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
@@ -240,12 +486,22 @@ const UsedCoreDialog = () => {
   };
   return (
     <>
-      <Button onClick={handleOpen}>Used</Button>
+      <Button onClick={handleOpen} className={classes.serverUsedButton}>
+        used
+        <BlockIcon className={classes.serverUsedButtonIcon} />
+      </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>used core</DialogTitle>
+        <DialogTitle>This core is used</DialogTitle>
         <DialogContent></DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>OK</Button>
+          <Grid container justify="center">
+            <Button
+              onClick={handleClose}
+              className={classes.usedDialogOKButton}
+            >
+              OK
+            </Button>
+          </Grid>
         </DialogActions>
       </Dialog>
     </>

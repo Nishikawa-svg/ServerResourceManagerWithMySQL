@@ -1,9 +1,32 @@
 import { Link } from "react-router-dom";
+import { makeStyles, Button, Grid } from "@material-ui/core";
+
+const useStyles = makeStyles({
+  link: {
+    textDecoration: "none",
+    textAlign: "center",
+  },
+  linkButton: {
+    textTransform: "none",
+  },
+});
+
 function Home() {
+  const classes = useStyles();
+
   return (
     <>
-      <div>home</div>
-      <Link to="/resource">go to resource page</Link>
+      <Grid container justify="center">
+        <Link to="/resource" className={classes.link}>
+          <Button
+            variant="contained"
+            color="secondary"
+            className={classes.linkButton}
+          >
+            Go to resource page
+          </Button>
+        </Link>
+      </Grid>
     </>
   );
 }

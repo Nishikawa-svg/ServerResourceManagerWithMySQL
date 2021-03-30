@@ -5,7 +5,38 @@ import LockIcon from "@material-ui/icons/Lock";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
 import { UserContext } from "../contexts/UserContext";
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles({
+  signInFormPaper: {
+    width: 360,
+    textAlign: "center",
+    // backgroundColor: "bluviolet",
+    border: "solid 1px",
+    marginBottom: 30,
+  },
+  signInFormTitle: {
+    fontSize: 24,
+    margin: "8px 8px",
+  },
+  signInFormLockIcon: {
+    width: 40,
+    height: 40,
+    marginTop: 20,
+  },
+  signInFormInputBox: {
+    height: 40,
+    marginBottom: 50,
+  },
+  signInFormButton: {
+    height: 50,
+    marginBottom: 10,
+    backgroundColor: "#1870db",
+    color: "white",
+    textTransform: "none",
+    "&:hover": {
+      backgroundColor: "blue",
+    },
+  },
+});
 
 function SignIn() {
   const history = useHistory();
@@ -20,53 +51,57 @@ function SignIn() {
 
   return (
     <>
-      <div>sign in</div>
       <Grid container justify="center">
-        <Paper className={classes.signInPaper}>
-          <Grid item xs={10}>
-            <Grid container direction="column">
-              <Grid item>
-                <LockIcon color="secondary" className={classes.lockIcon} />
-              </Grid>
-              <Grid item>
-                <div className={classes.title}>Sign In</div>
-              </Grid>
-              <Grid container justify="flex-start">
-                <Grid item>Username</Grid>
-              </Grid>
-              <Grid item>
-                <TextField
-                  className={classes.inputBox}
-                  variant="outlined"
-                  fullWidth
-                  inputRef={usernameElement}
-                />
-              </Grid>
-              <Grid container justify="flex-start">
-                <Grid item>Password</Grid>
-              </Grid>
-              <Grid item>
-                <TextField
-                  className={classes.inputBox}
-                  variant="outlined"
-                  fullWidth
-                  inputRef={passwordElement}
-                  type="password"
-                />
-              </Grid>
-              <Grid item>
-                <Button
-                  className={classes.signInButton}
-                  fullWidth
-                  variant="contained"
-                  onClick={handleSignIn}
-                >
-                  Sign in
-                </Button>
-              </Grid>
-              <Grid container justify="flex-end">
+        <Paper className={classes.signInFormPaper}>
+          <Grid container justify="center">
+            <Grid item xs={10}>
+              <Grid container direction="column">
                 <Grid item>
-                  <Link to="/admin">go to admin page</Link>
+                  <LockIcon
+                    color="secondary"
+                    className={classes.signInFormLockIcon}
+                  />
+                </Grid>
+                <Grid item>
+                  <div className={classes.signInFormTitle}>Sign In</div>
+                </Grid>
+                <Grid container justify="flex-start">
+                  <Grid item>Username</Grid>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    className={classes.signInFormInputBox}
+                    variant="outlined"
+                    fullWidth
+                    inputRef={usernameElement}
+                  />
+                </Grid>
+                <Grid container justify="flex-start">
+                  <Grid item>Password</Grid>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    className={classes.signInFormInputBox}
+                    variant="outlined"
+                    fullWidth
+                    inputRef={passwordElement}
+                    type="password"
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    className={classes.signInFormButton}
+                    fullWidth
+                    variant="contained"
+                    onClick={handleSignIn}
+                  >
+                    Sign in
+                  </Button>
+                </Grid>
+                <Grid container justify="flex-end">
+                  <Grid item>
+                    <Link to="/admin">go to admin page</Link>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>

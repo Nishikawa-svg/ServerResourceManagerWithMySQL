@@ -10,6 +10,7 @@ import {
   Redirect,
   Switch,
 } from "react-router-dom";
+import { makeStyles } from "@material-ui/core";
 import Providers from "./contexts/Context";
 import SignIn from "./components/SignIn";
 import Header from "./components/Header";
@@ -19,18 +20,33 @@ import AdminPage from "./components/AdminPage";
 import AdminSignIn from "./components/AdminSignIn";
 import AdminHeader from "./components/AdminHeader";
 
+const useStyles = makeStyles({
+  mainPage: {
+    padding: "10px 10px 10px 10px",
+  },
+});
+
 function App() {
+  const classes = useStyles();
   return (
     <>
       <Providers>
         <Router>
-          <AdminRoute />
-          <PrivateRoute />
+          <Headers />
+          <div className={classes.mainPage}>
+            <AdminRoute />
+            <PrivateRoute />
+          </div>
         </Router>
       </Providers>
     </>
   );
 }
+
+const Headers = () => {
+  const { isAdmin } = useContext(AuthenticationContext);
+  return <>{isAdmin ? <AdminHeader /> : <Header />}</>;
+};
 
 const PrivateRoute = () => {
   const { isAuth } = useContext(AuthenticationContext);
@@ -38,12 +54,12 @@ const PrivateRoute = () => {
     <>
       {isAuth ? (
         <>
-          <Route component={Home} path="/" exact />
+          <Route path="/" component={Home} exact />
 
-          <Route component={Resource} path="/resource" exact />
+          <Route path="/resource" component={Resource} exact />
         </>
       ) : (
-        <Route component={SignIn} path="/" exact />
+        <Route path="/" component={SignIn} exact />
       )}
     </>
   );
@@ -55,12 +71,10 @@ const AdminRoute = () => {
     <>
       {isAdmin ? (
         <>
-          <AdminHeader />
           <Route path="/admin" component={AdminPage} />
         </>
       ) : (
         <>
-          <Header />
           <Route path="/admin" component={AdminSignIn} />
         </>
       )}
