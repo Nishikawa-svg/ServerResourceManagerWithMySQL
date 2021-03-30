@@ -17,6 +17,7 @@ import {
   DialogTitle,
   TextField,
 } from "@material-ui/core";
+import sha256 from "crypto-js/sha256";
 
 function AdminPage() {
   const { getServers, servers } = useContext(ServerContext);
@@ -134,7 +135,7 @@ const AddUserDialog = () => {
       const newUser = {
         username: usernameEl.current.value,
         grade: gradeEl.current.value,
-        password: passwordEl.current.value,
+        hashedPassword: sha256(passwordEl.current.value).toString(),
       };
       addUser(newUser);
       setOpen(false);

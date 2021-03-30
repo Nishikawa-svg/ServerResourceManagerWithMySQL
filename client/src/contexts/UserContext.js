@@ -9,6 +9,7 @@ export const UserProvider = (props) => {
   const [users, setUsers] = useState([]);
   const getUsers = () => {
     Axios.get("http://localhost:4000/get_users").then((response) => {
+      console.log(response.data);
       setUsers(response.data);
     });
   };

@@ -43,10 +43,34 @@ const connection = mysql.createConnection(mysqlEnv.settings);
 //   console.log(result);
 // });
 
-app.get("/", (req, res) => {
+app.get("/users", (req, res) => {
   let sqlSelect = "select * from users";
   connection.query(sqlSelect, (error, result) => {
     res.send(result);
+  });
+});
+app.get("/servers", (req, res) => {
+  let sqlSelect = "select * from servers";
+  connection.query(sqlSelect, (error, result) => {
+    res.send(result);
+  });
+});
+//const p = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
+// connection.query("insert into admin values(?)", [p], (error, result) => {
+//   console.log("added password");
+// });
+
+app.post("/admin_sign_in", (req, res) => {
+  const hashedPassword = req.body.hashedPassword;
+  let sqlSelect = "select password from admin";
+  connection.query(sqlSelect, (error, result) => {
+    console.log(result[0].password);
+    console.log(hashedPassword);
+    let authentication = false;
+    if (result[0].password === hashedPassword) {
+      authentication = true;
+    }
+    res.send({ authentication });
   });
 });
 
@@ -57,36 +81,36 @@ app.post("/auto_sign_in", (req, res) => {
     console.log(result);
     let msg;
     let userInfo;
-    let valid = false;
+    let authentication = false;
     if (result.length !== 1) {
       msg = "auto signIn failed";
     } else {
       msg = "auto signIn succesed";
       userInfo = result[0];
-      valid = true;
+      authentication = true;
     }
-    res.send({ msg, valid, userInfo });
+    res.send({ msg, authentication, userInfo });
   });
 });
 
 app.post("/sign_in", (req, res) => {
   const username = req.body.username;
-  const password = req.body.password;
+  const hashedPassword = req.body.hashedPassword;
   let sqlSelect =
     "select uid,username from users where username=? and password=?";
-  console.log(username, password);
-  connection.query(sqlSelect, [username, password], (error, result) => {
+  console.log(username, hashedPassword);
+  connection.query(sqlSelect, [username, hashedPassword], (error, result) => {
     let msg;
     let userInfo;
-    let valid = false;
+    let authentication = false;
     if (result.length !== 1) {
       msg = "username or password invalid";
     } else {
       msg = "sign in succesed";
       userInfo = result[0];
-      valid = true;
+      authentication = true;
     }
-    res.send({ msg, valid, userInfo });
+    res.send({ msg, authentication, userInfo });
   });
 });
 
@@ -137,18 +161,18 @@ app.get("/get_servers", (req, res) => {
 });
 
 app.get("/get_users", (req, res) => {
-  let sqlSelect = "select * from users";
+  let sqlSelect = "select uid, username, grade from users";
   connection.query(sqlSelect, (error, result) => {
     res.send(result);
   });
 });
 app.post("/add_user", (req, res) => {
-  //console.log(req.body);
-  const { username, grade, password } = req.body.newUser;
+  console.log(req.body);
+  const { username, grade, hashedPassword } = req.body.newUser;
   let sqlInsert = "insert into users values(?,?,?,?,now())";
   connection.query(
     sqlInsert,
-    [nanoid(), username, grade, password],
+    [nanoid(), username, grade, hashedPassword],
     (error, result) => {
       res.send(result);
     }

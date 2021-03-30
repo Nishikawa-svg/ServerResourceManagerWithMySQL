@@ -1,5 +1,7 @@
 import Axios from "axios";
 import { createContext, useState, useEffect } from "react";
+import sha256 from "crypto-js/sha256";
+
 export const AuthenticationContext = createContext();
 
 export const AuthenticationProvider = (props) => {
@@ -8,8 +10,8 @@ export const AuthenticationProvider = (props) => {
     if (storageId !== null) {
       Axios.post("http://localhost:4000/auto_sign_in", { storageId }).then(
         (response) => {
-          const { valid, userInfo } = response.data;
-          if (valid) {
+          const { authentication, userInfo } = response.data;
+          if (authentication) {
             setUser(userInfo);
           } else {
             localStorage.removeItem("srm_auth_id");
@@ -29,13 +31,14 @@ export const AuthenticationProvider = (props) => {
   };
 
   const signIn = (username, password) => {
+    const hashedPassword = sha256(password).toString();
     Axios.post("http://localhost:4000/sign_in", {
       username,
-      password,
+      hashedPassword,
     }).then((response) => {
       console.log(response.data);
-      const { msg, valid, userInfo } = response.data;
-      if (valid) {
+      const { msg, authentication, userInfo } = response.data;
+      if (authentication) {
         localStorage.setItem("srm_auth_id", userInfo.uid);
         setIsAuth(true);
         setUser(userInfo);
@@ -46,9 +49,16 @@ export const AuthenticationProvider = (props) => {
   };
 
   const adminSignIn = (password) => {
-    if (password === "password") {
-      setIsAdmin(true);
-    }
+    const hashedPassword = sha256(password).toString();
+    Axios.post("http://localhost:4000/admin_sign_in", { hashedPassword }).then(
+      (response) => {
+        if (response.data.authentication) {
+          setIsAdmin(true);
+        } else {
+          alert("Sign in failed");
+        }
+      }
+    );
   };
 
   const adminSignOut = () => {
