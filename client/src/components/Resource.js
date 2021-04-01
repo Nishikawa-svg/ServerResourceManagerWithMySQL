@@ -15,7 +15,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
   Checkbox,
@@ -146,8 +145,6 @@ function Resource() {
   };
 
   const completeCore = (completeInfo) => {
-    //complete task
-    console.log(completeInfo);
     socket.emit("complete_core", { completeInfo });
   };
 
@@ -310,17 +307,6 @@ function Resource() {
 }
 
 const ReserveCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
-  const dt = new Date();
-  const initialEndTime = {
-    datetime: `${dt.getFullYear()}-${`${dt.getMonth() + 1}`.padStart(
-      2,
-      0
-    )}-${`${dt.getDate() + 1}`.padStart(2, 0)}T${`${dt.getHours()}`.padStart(
-      2,
-      0
-    )}:${`${dt.getMinutes()}`.padStart(2, 0)}`,
-  };
-  //console.log(initialEndTime);
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);

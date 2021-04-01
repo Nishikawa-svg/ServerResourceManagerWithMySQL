@@ -1,15 +1,6 @@
 import { useContext } from "react";
-import {
-  AuthenticationContext,
-  AuthenticationProvider,
-} from "./contexts/AuthenticationContext";
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  Redirect,
-  Switch,
-} from "react-router-dom";
+import { AuthenticationContext } from "./contexts/AuthenticationContext";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import { makeStyles } from "@material-ui/core";
 import Providers from "./contexts/Context";
 import SignIn from "./components/SignIn";

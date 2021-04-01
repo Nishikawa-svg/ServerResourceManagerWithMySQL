@@ -1,6 +1,6 @@
 import { ServerContext } from "../contexts/ServerContext";
 import { UserContext } from "../contexts/UserContext";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useState, useRef } from "react";
 import {
   TableContainer,
   Table,
@@ -13,7 +13,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
   Paper,
@@ -198,8 +197,8 @@ const useStyles = makeStyles({
 
 function AdminPage() {
   const classes = useStyles();
-  const { getServers, servers } = useContext(ServerContext);
-  const { getUsers, users } = useContext(UserContext);
+  const { servers } = useContext(ServerContext);
+  const { users } = useContext(UserContext);
 
   return (
     <>
@@ -334,6 +333,7 @@ const AddUserDialog = () => {
     let userDuplicated = false;
     users.map((user) => {
       if (usernameEl.current.value === user.username) userDuplicated = true;
+      return null;
     });
     if (userDuplicated) {
       alert(
@@ -463,6 +463,7 @@ const EditUserDialog = ({ uid, username, grade }) => {
       if (user.uid !== uid && user.username === edited.username) {
         userDuplicated = true;
       }
+      return null;
     });
     if (userDuplicated) {
       alert(
@@ -548,7 +549,6 @@ const EditUserDialog = ({ uid, username, grade }) => {
 const DeleteUserDialog = ({ uid, username }) => {
   const classes = useStyles();
   const { deleteUser } = useContext(UserContext);
-  const { getServers } = useContext(ServerContext);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const handleOpen = () => {
@@ -623,11 +623,24 @@ const AddServerDialog = () => {
   };
   const handleAddServer = () => {
     const newServer = {
-      server_address: serverAddressEl.current.value,
-      max_cores: maxCoresEl.current.value,
+      server_address: serverAddressEl.current.value.trim(),
+      max_cores: Number(maxCoresEl.current.value),
     };
-    addServer(newServer);
-    setOpen(false);
+    console.log(newServer);
+    console.log(typeof newServer.server_address);
+    console.log(typeof newServer.max_cores);
+    if (newServer.server_address.length === 0) {
+      alert("Error : Pease enter the server address");
+    } else if (newServer.max_cores !== parseInt(newServer.max_cores, 10)) {
+      alert("Error : Max ciores must be an integer between 1 and 16");
+    } else if (newServer.max_cores <= 0) {
+      alert("Error : Max ciiores must be an integer between 1 and 16");
+    } else if (newServer.max_cores > 16) {
+      alert("Error : Max coiiires must be an integer between 1 and 16");
+    } else {
+      addServer(newServer);
+      setOpen(false);
+    }
   };
   return (
     <>

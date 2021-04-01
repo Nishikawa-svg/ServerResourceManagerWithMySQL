@@ -10,14 +10,12 @@ export const ServerProvider = (props) => {
   }, []);
   const getServers = () => {
     Axios.get("http://localhost:4000/get_servers").then((response) => {
-      console.log(response.data);
       setServers(response.data);
     });
   };
   const addServer = (newServer) => {
     Axios.post("http://localhost:4000/add_server", { newServer }).then(
       (response) => {
-        console.log(response.data);
         getServers();
       }
     );
@@ -27,14 +25,12 @@ export const ServerProvider = (props) => {
       serverId,
       editServer,
     }).then((response) => {
-      console.log(response.data);
       getServers();
     });
   };
   const deleteServer = (serverId) => {
     Axios.post("http://localhost:4000/delete_server", { serverId }).then(
       (response) => {
-        console.log(response.data);
         getServers();
       }
     );

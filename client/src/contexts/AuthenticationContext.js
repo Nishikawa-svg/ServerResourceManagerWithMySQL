@@ -28,6 +28,7 @@ export const AuthenticationProvider = (props) => {
     localStorage.removeItem("srm_auth_id");
     setIsAuth(false);
     setUser(null);
+    console.log("successfully signed out");
   };
 
   const signIn = (username, password) => {
@@ -36,7 +37,7 @@ export const AuthenticationProvider = (props) => {
       username,
       hashedPassword,
     }).then((response) => {
-      console.log(response.data);
+      console.log(response.data.msg);
       const { msg, authentication, userInfo } = response.data;
       if (authentication) {
         localStorage.setItem("srm_auth_id", userInfo.uid);

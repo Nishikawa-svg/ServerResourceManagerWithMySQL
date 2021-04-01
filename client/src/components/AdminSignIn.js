@@ -1,6 +1,5 @@
 import { useRef, useContext } from "react";
 import { Grid, Paper, TextField, makeStyles, Button } from "@material-ui/core";
-import LockIcon from "@material-ui/icons/Lock";
 import SupervisedUserCircleIcon from "@material-ui/icons/SupervisedUserCircle";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
 

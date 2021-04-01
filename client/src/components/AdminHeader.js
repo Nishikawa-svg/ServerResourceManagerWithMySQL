@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
-import { makeStyles, Paper, Grid, Button } from "@material-ui/core";
+import { makeStyles, Paper, Grid } from "@material-ui/core";
 
 const useStyles = makeStyles({
   headerPaper: {

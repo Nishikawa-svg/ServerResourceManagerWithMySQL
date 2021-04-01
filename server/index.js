@@ -97,7 +97,6 @@ app.post("/sign_in", (req, res) => {
   const hashedPassword = req.body.hashedPassword;
   let sqlSelect =
     "select uid,username from users where username=? and password=?";
-  // console.log(username, hashedPassword);
   connection.query(sqlSelect, [username, hashedPassword], (error, result) => {
     let msg;
     let userInfo;
@@ -105,7 +104,7 @@ app.post("/sign_in", (req, res) => {
     if (result.length !== 1) {
       msg = "username or password invalid";
     } else {
-      msg = "sign in succesed";
+      msg = "Successfully signed in";
       userInfo = result[0];
       authentication = true;
     }
@@ -129,7 +128,6 @@ app.get("/get_servers", (req, res) => {
       delete snap.server_address;
       delete snap.max_cores;
       delete snap.registration_date;
-      // console.log(snap);
       let core_uid = [];
       let core_start = [];
       let core_end = [];
@@ -152,7 +150,6 @@ app.get("/get_servers", (req, res) => {
         ...server,
         use_status: use_status,
       };
-      //   console.log(server);
       return server;
     });
     res.send(servers);
@@ -166,7 +163,6 @@ app.get("/get_users", (req, res) => {
   });
 });
 app.post("/add_user", (req, res) => {
-  // console.log(req.body);
   const { username, grade, hashedPassword } = req.body.newUser;
   let sqlInsert = "insert into users values(?,?,?,?,now())";
   connection.query(
@@ -178,7 +174,6 @@ app.post("/add_user", (req, res) => {
   );
 });
 app.post("/add_server", (req, res) => {
-  //console.log(req.body);
   const { server_address, max_cores } = req.body.newServer;
   let sqlInsert =
     "insert into servers value(?,?,?,now(),null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)";
@@ -191,7 +186,6 @@ app.post("/add_server", (req, res) => {
   );
 });
 app.post("/edit_user", (req, res) => {
-  //console.log(req.body);
   const uid = req.body.uid;
   const { username, grade } = req.body.editUser;
   let sqlUpdate = "update users set username=?, grade=? where uid=?";
@@ -205,28 +199,22 @@ app.post("/delete_user", (req, res) => {
   connection.query(sqlSelect, (error, servers) => {
     servers.map((server) => {
       for (let core_index = 1; core_index <= server.max_cores; core_index++) {
-        console.log(core_index);
         let sqlUpdate = `update servers set core_${core_index}_uid=null, core_${core_index}_start=null, core_${core_index}_end=null where server_id=? and core_${core_index}_uid=?`;
         connection.query(
           sqlUpdate,
           [server.server_id, uid],
-          (error, updateResult) => {
-            console.log(updateResult);
-            console.log("query", sqlUpdate);
-          }
+          (error, updateResult) => {}
         );
       }
     });
     let sqlDelete = "delete from users where uid=?";
     connection.query(sqlDelete, [uid], (error, deleteResult) => {
-      console.log(deleteResult);
       res.send("deleted");
     });
   });
 });
 
 app.post("/edit_server", (req, res) => {
-  //console.log(req.body);
   const server_id = req.body.serverId;
   const { server_address, max_cores } = req.body.editServer;
   let sqlUpdate =
@@ -244,7 +232,6 @@ app.post("/delete_server", (req, res) => {
   const server_id = req.body.serverId;
   let sqlDelete = "delete from servers where server_id=?";
   connection.query(sqlDelete, [server_id], (error, result) => {
-    console.log(result);
     res.send("delete server");
   });
 });
@@ -253,31 +240,31 @@ io.on("connection", (socket) => {
   console.log(socket.id, "is connecting");
 
   socket.on("regist_core", (input) => {
-    console.log(input);
-
     let { uid, server_id, core_index, isUndecided, end } = input.registInfo;
     if (!isUndecided) {
       let [date, time] = end.split("T");
       end = `${date} ${time}:00`;
-      // console.log(end);
     }
 
     let sqlUpdate = `update servers set core_${core_index + 1}_uid=?, core_${
       core_index + 1
     }_start=now(), core_${core_index + 1}_end=? where server_id=?`;
     connection.query(sqlUpdate, [uid, end, server_id], (error, result) => {
-      io.emit("new_servers", { message: "OK" });
+      io.emit("new_servers", {
+        messageFromServer: "Successful database update (reserve core)",
+      });
     });
   });
 
   socket.on("complete_core", (input) => {
-    console.log(input);
     let { uid, server_id, core_index } = input.completeInfo;
     let sqlUpdate = `update servers set core_${core_index + 1}_uid=null, core_${
       core_index + 1
     }_start=null, core_${core_index + 1}_end=null where server_id=?`;
     connection.query(sqlUpdate, [server_id], (error, result) => {
-      io.emit("new_servers", { message: "ok" });
+      io.emit("new_servers", {
+        messageFromServer: "Successful database update (complete core)",
+      });
     });
   });
 

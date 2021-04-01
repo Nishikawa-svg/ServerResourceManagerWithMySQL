@@ -1,9 +1,8 @@
-import { useEffect, useContext, useRef } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { useContext, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Grid, Paper, Button, TextField, makeStyles } from "@material-ui/core";
 import LockIcon from "@material-ui/icons/Lock";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
-import { UserContext } from "../contexts/UserContext";
 
 const useStyles = makeStyles({
   signInFormPaper: {
@@ -46,9 +45,8 @@ const useStyles = makeStyles({
 });
 
 function SignIn() {
-  const history = useHistory();
   const classes = useStyles();
-  const { isAuth, setIsAuth, signIn } = useContext(AuthenticationContext);
+  const { signIn } = useContext(AuthenticationContext);
   const usernameElement = useRef(null);
   const passwordElement = useRef(null);
 

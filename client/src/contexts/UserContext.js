@@ -11,7 +11,6 @@ export const UserProvider = (props) => {
   const [users, setUsers] = useState([]);
   const getUsers = () => {
     Axios.get("http://localhost:4000/get_users").then((response) => {
-      console.log(response.data);
       setUsers(response.data);
     });
   };
@@ -25,7 +24,6 @@ export const UserProvider = (props) => {
   const editUser = (uid, editUser) => {
     Axios.post("http://localhost:4000/edit_user", { uid, editUser }).then(
       (response) => {
-        console.log(response);
         getUsers();
       }
     );
@@ -33,7 +31,6 @@ export const UserProvider = (props) => {
   const deleteUser = (uid) => {
     Axios.post("http://localhost:4000/delete_user", { uid }).then(
       (response) => {
-        console.log(response);
         getUsers();
         getServers();
       }

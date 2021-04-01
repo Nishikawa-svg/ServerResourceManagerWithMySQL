@@ -33,9 +33,7 @@ const useStyles = makeStyles({
 
 function Header() {
   const classes = useStyles();
-  const { isAuth, setIsAuth, signOut, user } = useContext(
-    AuthenticationContext
-  );
+  const { signOut, user } = useContext(AuthenticationContext);
   const history = useHistory();
   const handleSignOut = () => {
     signOut();
