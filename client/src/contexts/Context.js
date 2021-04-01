@@ -5,9 +5,9 @@ import { AuthenticationProvider } from "./AuthenticationContext";
 const Providers = (props) => {
   return (
     <AuthenticationProvider>
-      <UserProvider>
-        <ServerProvider>{props.children}</ServerProvider>
-      </UserProvider>
+      <ServerProvider>
+        <UserProvider>{props.children}</UserProvider>
+      </ServerProvider>
     </AuthenticationProvider>
   );
 };

@@ -131,12 +131,13 @@ function Resource() {
     socket.on("new_servers", (newServers) => {
       console.log(newServers);
       getServers();
+      getUsers();
     });
     return () => {
       socket.disconnect();
     };
-  });
-  const { users } = useContext(UserContext);
+  }, []);
+  const { users, getUsers } = useContext(UserContext);
   const { servers, getServers } = useContext(ServerContext);
   const { user } = useContext(AuthenticationContext);
 
@@ -152,7 +153,7 @@ function Resource() {
 
   const getUserName = (uid) => {
     const index = users.findIndex((user) => user.uid === uid);
-    if (users) return users[index].username;
+    if (index !== -1 && users) return users[index].username;
   };
 
   const getLocalDateTime = (datetime) => {
@@ -319,7 +320,7 @@ const ReserveCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
       0
     )}:${`${dt.getMinutes()}`.padStart(2, 0)}`,
   };
-  console.log(initialEndTime);
+  //console.log(initialEndTime);
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -411,7 +412,7 @@ const ReserveCoreDialog = ({ uid, serverId, coreIndex, registCore }) => {
               className={classes.reservationDialogReserveButton}
               disabled={!(endTime || checked)}
             >
-              Regist
+              Reserve
             </Button>
           </Grid>
         </DialogActions>

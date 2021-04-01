@@ -1,8 +1,10 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import Axios from "axios";
+import { ServerContext } from "./ServerContext";
 export const UserContext = createContext();
 
 export const UserProvider = (props) => {
+  const { getServers } = useContext(ServerContext);
   useEffect(() => {
     getUsers();
   }, []);
@@ -28,6 +30,15 @@ export const UserProvider = (props) => {
       }
     );
   };
+  const deleteUser = (uid) => {
+    Axios.post("http://localhost:4000/delete_user", { uid }).then(
+      (response) => {
+        console.log(response);
+        getUsers();
+        getServers();
+      }
+    );
+  };
   return (
     <UserContext.Provider
       value={{
@@ -35,6 +46,7 @@ export const UserProvider = (props) => {
         getUsers: getUsers,
         addUser: addUser,
         editUser: editUser,
+        deleteUser: deleteUser,
       }}
     >
       {props.children}

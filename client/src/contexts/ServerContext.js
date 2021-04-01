@@ -31,6 +31,14 @@ export const ServerProvider = (props) => {
       getServers();
     });
   };
+  const deleteServer = (serverId) => {
+    Axios.post("http://localhost:4000/delete_server", { serverId }).then(
+      (response) => {
+        console.log(response.data);
+        getServers();
+      }
+    );
+  };
   return (
     <ServerContext.Provider
       value={{
@@ -38,6 +46,7 @@ export const ServerProvider = (props) => {
         servers: servers,
         addServer: addServer,
         editServer: editServer,
+        deleteServer: deleteServer,
       }}
     >
       {props.children}

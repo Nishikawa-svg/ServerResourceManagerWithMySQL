@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     fontSize: 24,
     fontWeight: "bolder",
     textDecoration: "none",
-    color: "#",
+    color: "#555555",
     marginTop: 18,
     textAlign: "center",
   },
@@ -45,9 +45,7 @@ function Header() {
     <>
       <Paper className={classes.headerPaper}>
         <Grid container justify="center">
-          <Grid item xs={3}>
-            {isAuth ? <button onClick={handleSignOut}>sign out</button> : null}
-          </Grid>
+          <Grid item xs={3}></Grid>
 
           <Grid item xs={6}>
             <Grid container justify="center">

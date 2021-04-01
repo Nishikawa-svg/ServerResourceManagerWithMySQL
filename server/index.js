@@ -11,6 +11,8 @@ const io = require("socket.io")(httpServer, {
   cors: { origin: "*" },
 });
 
+const limitCores = 16;
+
 app.use(cors());
 app.use(express.json());
 
@@ -197,6 +199,31 @@ app.post("/edit_user", (req, res) => {
     res.send(result);
   });
 });
+app.post("/delete_user", (req, res) => {
+  const uid = req.body.uid;
+  let sqlSelect = "select server_id, max_cores from servers";
+  connection.query(sqlSelect, (error, servers) => {
+    servers.map((server) => {
+      for (let core_index = 1; core_index <= server.max_cores; core_index++) {
+        console.log(core_index);
+        let sqlUpdate = `update servers set core_${core_index}_uid=null, core_${core_index}_start=null, core_${core_index}_end=null where server_id=? and core_${core_index}_uid=?`;
+        connection.query(
+          sqlUpdate,
+          [server.server_id, uid],
+          (error, updateResult) => {
+            console.log(updateResult);
+            console.log("query", sqlUpdate);
+          }
+        );
+      }
+    });
+    let sqlDelete = "delete from users where uid=?";
+    connection.query(sqlDelete, [uid], (error, deleteResult) => {
+      console.log(deleteResult);
+      res.send("deleted");
+    });
+  });
+});
 
 app.post("/edit_server", (req, res) => {
   //console.log(req.body);
@@ -211,6 +238,15 @@ app.post("/edit_server", (req, res) => {
       res.send(result);
     }
   );
+});
+
+app.post("/delete_server", (req, res) => {
+  const server_id = req.body.serverId;
+  let sqlDelete = "delete from servers where server_id=?";
+  connection.query(sqlDelete, [server_id], (error, result) => {
+    console.log(result);
+    res.send("delete server");
+  });
 });
 
 io.on("connection", (socket) => {

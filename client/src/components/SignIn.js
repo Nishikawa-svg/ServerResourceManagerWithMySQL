@@ -36,6 +36,13 @@ const useStyles = makeStyles({
       backgroundColor: "blue",
     },
   },
+  adminLink: {
+    textDecoration: "none",
+    color: "blue",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
 });
 
 function SignIn() {
@@ -100,7 +107,9 @@ function SignIn() {
                 </Grid>
                 <Grid container justify="flex-end">
                   <Grid item>
-                    <Link to="/admin">go to admin page</Link>
+                    <Link to="/admin" className={classes.adminLink}>
+                      Go to admin page
+                    </Link>
                   </Grid>
                 </Grid>
               </Grid>
