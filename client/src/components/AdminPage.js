@@ -331,22 +331,23 @@ const AddUserDialog = () => {
   };
   const handleAddUser = () => {
     let userDuplicated = false;
-    users.map((user) => {
-      if (usernameEl.current.value === user.username) userDuplicated = true;
-      return null;
+    let newUser = {
+      username: usernameEl.current.value.trim(),
+      grade: gradeEl.current.value.trim(),
+    };
+    users.forEach((user) => {
+      if (newUser.username === user.username) userDuplicated = true;
     });
     if (userDuplicated) {
       alert(
-        `Username ${usernameEl.current.value} is already existed. Please change username.`
+        `Error : Username ${newUser.username} is already existed. Please change username.`
       );
+    } else if (newUser.username === "") {
+      alert("Error : Enter username");
     } else if (passwordEl.current.value !== confirmPasswordEl.current.value) {
-      alert("not same password");
+      alert("Error : Not same password.");
     } else {
-      const newUser = {
-        username: usernameEl.current.value,
-        grade: gradeEl.current.value,
-        hashedPassword: sha256(passwordEl.current.value).toString(),
-      };
+      newUser.hashedPassword = sha256(passwordEl.current.value).toString();
       addUser(newUser);
       setOpen(false);
     }
@@ -459,18 +460,22 @@ const EditUserDialog = ({ uid, username, grade }) => {
   };
   const handleEditUser = () => {
     let userDuplicated = false;
-    users.map((user) => {
-      if (user.uid !== uid && user.username === edited.username) {
+    let editedUser = edited;
+    editedUser.username = editedUser.username.trim();
+    editedUser.grade = editedUser.grade.trim();
+    users.forEach((user) => {
+      if (user.uid !== uid && user.username === editedUser.username) {
         userDuplicated = true;
       }
-      return null;
     });
-    if (userDuplicated) {
+    if (editedUser.username === "") {
+      alert("Please enter username");
+    } else if (userDuplicated) {
       alert(
-        `Username ${edited.username} is already exist. Please change username`
+        `Username ${editedUser.username} is already exist. Please change username`
       );
     } else {
-      editUser(uid, edited);
+      editUser(uid, editedUser);
       setOpen(false);
     }
   };
@@ -627,16 +632,14 @@ const AddServerDialog = () => {
       max_cores: Number(maxCoresEl.current.value),
     };
     console.log(newServer);
-    console.log(typeof newServer.server_address);
-    console.log(typeof newServer.max_cores);
     if (newServer.server_address.length === 0) {
       alert("Error : Pease enter the server address");
     } else if (newServer.max_cores !== parseInt(newServer.max_cores, 10)) {
-      alert("Error : Max ciores must be an integer between 1 and 16");
+      alert("Error : Max cores must be an integer between 1 and 16");
     } else if (newServer.max_cores <= 0) {
-      alert("Error : Max ciiores must be an integer between 1 and 16");
+      alert("Error : Max cores must be an integer between 1 and 16");
     } else if (newServer.max_cores > 16) {
-      alert("Error : Max coiiires must be an integer between 1 and 16");
+      alert("Error : Max cores must be an integer between 1 and 16");
     } else {
       addServer(newServer);
       setOpen(false);

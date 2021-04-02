@@ -19,48 +19,19 @@ app.use(express.json());
 //mysql set up
 const connection = mysql.createConnection(mysqlEnv.settings);
 
-// const sqlCreate =
-//   "create table servers(\
-//   server_id varchar(64),\
-//   server_address varchar(64),\
-//   max_cores int,\
-//   registration_date datetime,\
-//   core_1_uid varchar(64), core_1_start datetime, core_1_end datetime,\
-//   core_2_uid varchar(64), core_2_start datetime, core_2_end datetime,\
-//   core_3_uid varchar(64), core_3_start datetime, core_3_end datetime,\
-//   core_4_uid varchar(64), core_4_start datetime, core_4_end datetime,\
-//   core_5_uid varchar(64), core_5_start datetime, core_5_end datetime,\
-//   core_6_uid varchar(64), core_6_start datetime, core_6_end datetime,\
-//   core_7_uid varchar(64), core_7_start datetime, core_7_end datetime,\
-//   core_8_uid varchar(64), core_8_start datetime, core_8_end datetime,\
-//   core_9_uid varchar(64), core_9_start datetime, core_9_end datetime,\
-//   core_10_uid varchar(64), core_10_start datetime, core_10_end datetime,\
-//   core_11_uid varchar(64), core_11_start datetime, core_11_end datetime,\
-//   core_12_uid varchar(64), core_12_start datetime, core_12_end datetime,\
-//   core_13_uid varchar(64), core_13_start datetime, core_13_end datetime,\
-//   core_14_uid varchar(64), core_14_start datetime, core_14_end datetime,\
-//   core_15_uid varchar(64), core_15_start datetime, core_15_end datetime,\
-//   core_16_uid varchar(64), core_16_start datetime, core_16_end datetime)";
-// connection.query(sqlCreate, (error, result) => {
-//   console.log(result);
-// });
-
 app.get("/users", (req, res) => {
   let sqlSelect = "select * from users";
   connection.query(sqlSelect, (error, result) => {
     res.send(result);
   });
 });
+
 app.get("/servers", (req, res) => {
   let sqlSelect = "select * from servers";
   connection.query(sqlSelect, (error, result) => {
     res.send(result);
   });
 });
-//const p = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
-// connection.query("insert into admin values(?)", [p], (error, result) => {
-//   console.log("added password");
-// });
 
 app.post("/admin_sign_in", (req, res) => {
   const hashedPassword = req.body.hashedPassword;
@@ -162,6 +133,7 @@ app.get("/get_users", (req, res) => {
     res.send(result);
   });
 });
+
 app.post("/add_user", (req, res) => {
   const { username, grade, hashedPassword } = req.body.newUser;
   let sqlInsert = "insert into users values(?,?,?,?,now())";
@@ -173,10 +145,14 @@ app.post("/add_user", (req, res) => {
     }
   );
 });
+
 app.post("/add_server", (req, res) => {
   const { server_address, max_cores } = req.body.newServer;
-  let sqlInsert =
-    "insert into servers value(?,?,?,now(),null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)";
+  let sqlInsert = "insert into servers value(?,?,?,now()";
+  for (let i = 0; i < limitCores * 3; i++) {
+    sqlInsert += ",null";
+  }
+  sqlInsert += ")";
   connection.query(
     sqlInsert,
     [nanoid(), server_address, max_cores],
@@ -185,6 +161,7 @@ app.post("/add_server", (req, res) => {
     }
   );
 });
+
 app.post("/edit_user", (req, res) => {
   const uid = req.body.uid;
   const { username, grade } = req.body.editUser;
@@ -193,6 +170,7 @@ app.post("/edit_user", (req, res) => {
     res.send(result);
   });
 });
+
 app.post("/delete_user", (req, res) => {
   const uid = req.body.uid;
   let sqlSelect = "select server_id, max_cores from servers";
@@ -245,7 +223,6 @@ io.on("connection", (socket) => {
       let [date, time] = end.split("T");
       end = `${date} ${time}:00`;
     }
-
     let sqlUpdate = `update servers set core_${core_index + 1}_uid=?, core_${
       core_index + 1
     }_start=now(), core_${core_index + 1}_end=? where server_id=?`;

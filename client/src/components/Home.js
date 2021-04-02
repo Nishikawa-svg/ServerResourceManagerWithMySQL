@@ -8,6 +8,15 @@ const useStyles = makeStyles({
   },
   linkButton: {
     textTransform: "none",
+    marginBottom: 40,
+  },
+  messageTitle: {
+    marginTop: 40,
+    textAlign: "center",
+    fontSize: 24,
+  },
+  messageContent: {
+    textAlign: "center",
   },
 });
 
@@ -27,6 +36,11 @@ function Home() {
           </Button>
         </Link>
       </Grid>
+      <hr />
+      <div className={classes.messageTitle}>messages from admin</div>
+      <div className={classes.messageContent}>
+        <div>no messages</div>
+      </div>
     </>
   );
 }
