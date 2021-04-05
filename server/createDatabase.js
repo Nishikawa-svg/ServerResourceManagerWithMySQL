@@ -90,7 +90,7 @@ connection.connect((error) => {
     console.log(msg4);
     console.log(msg5);
 
-    console.log("all tasks complete");
+    console.log("all tasks completed");
   };
 
   addTable();
