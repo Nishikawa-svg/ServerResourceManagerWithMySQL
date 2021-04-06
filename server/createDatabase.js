@@ -1,14 +1,18 @@
 const mysql = require("mysql");
 const sha256 = require("crypto-js/sha256");
+const fs = require("fs");
+
+const host = "";
+const user = "";
+const password = "";
+const databaseName = "server_resource_manager";
 
 const connection = mysql.createConnection({
-  host: "",
-  user: "",
-  password: "",
+  host: host,
+  user: user,
+  password: password,
   multipleStatements: true,
 });
-
-const databaseName = "server_resource_manager";
 
 connection.connect((error) => {
   const createDatabase = () => {
@@ -89,6 +93,15 @@ connection.connect((error) => {
     console.log(msg3);
     console.log(msg4);
     console.log(msg5);
+    const content = 
+		  `exports.settings = { host:"${host}", user:"${user}", password:"${password}", database:"${databaseName}", multipleStatements: true, };`;
+    const writeFile = (path,data) => {
+       fs.writeFile(path,data,(error) => {
+           if(error) throw error;
+       })
+    }
+    writeFile("mySQLSetting.js",content);
+    console.log("created mysql setting");
 
     console.log("all tasks completed");
   };
